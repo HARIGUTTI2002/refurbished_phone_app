@@ -1,0 +1,5 @@
+id,brand,model,storage,color,condition,base_price,stock,tags,overrides_json,listings_json
+1,redmi,k50i,256,SKY BLUE,Good,50.0,3,,{},"{""X"": {""status"": ""listed"", ""price"": 55.56, ""condition_mapped"": ""Good""}}"
+2,Apple,iPhone 11,64GB,White,Good,320.0,3,refurbished,{},"{""Y"": {""status"": ""listed"", ""price"": 350.0, ""condition_mapped"": ""2 stars (Good)""}}"
+3,Samsung,Galaxy S21,128GB,Gray,New,500.0,10,,{},"{""Z"": {""status"": ""listed"", ""price"": 568.18, ""condition_mapped"": ""New""}}"
+4,Nokia,3310,16MB,Blue,Scrap,10.0,0,out of stock,{},{}

@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+<h3>{{ 'Edit Phone' if phone else 'Add Phone' }}</h3>
+<form method="post" novalidate>
+  <div class="row">
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Brand</label>
+      <input name="brand" class="form-control" value="{{ phone.brand if phone else '' }}" required>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Model</label>
+      <input name="model" class="form-control" value="{{ phone.model if phone else '' }}" required>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Condition</label>
+      <select name="condition" class="form-select" required>
+        {% for c in conditions %}
+          <option value="{{ c }}" {% if phone and phone.condition==c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Storage</label>
+      <input name="storage" class="form-control" value="{{ phone.storage if phone else '' }}">
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Color</label>
+      <input name="color" class="form-control" value="{{ phone.color if phone else '' }}">
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Base Price ($)</label>
+      <input name="base_price" class="form-control" type="number" step="0.01" min="0" value="{{ phone.base_price if phone else '' }}" required>
+      <div class="form-text">This is the desired net revenue. Platform listing price is auto-computed to cover fees.</div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Stock</label>
+      <input name="stock" class="form-control" type="number" step="1" min="0" value="{{ phone.stock if phone else '0' }}" required>
+    </div>
+    <div class="col-md-8 mb-3">
+      <label class="form-label">Tags</label>
+      <input name="tags" class="form-control" value="{{ phone.tags if phone else '' }}" placeholder="e.g., refurbished, out of stock, discontinued">
+    </div>
+  </div>
+  <button class="btn btn-primary">Save</button>
+  <a class="btn btn-secondary" href="{{ url_for('index') }}">Cancel</a>
+</form>
+{% endblock %}

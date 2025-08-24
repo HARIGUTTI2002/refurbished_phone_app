@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3>Inventory</h3>
+  <a class="btn btn-success" href="{{ url_for('add_phone') }}">+ Add Phone</a>
+</div>
+
+<form class="row g-2 mb-3" method="get">
+  <div class="col-md-4">
+    <input class="form-control" name="q" placeholder="Search brand or model" value="{{ q or '' }}">
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="condition">
+      <option value="">All Conditions</option>
+      {% for c in CONDITION_MAP.keys() %}
+      <option value="{{ c }}" {% if cond==c %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="platform">
+      <option value="">All Platforms</option>
+      {% for p in platforms %}
+      <option value="{{ p }}" {% if platform==p %}selected{% endif %}>Listed on {{ p }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-outline-primary w-100">Apply</button>
+  </div>
+</form>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th>ID</th><th>Brand</th><th>Model</th><th>Specs</th><th>Condition</th><th>Stock</th>
+      <th>Base Price ($)</th><th>Auto Price (X/Y/Z)</th><th>Overrides</th><th>Listings</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in phones %}
+    {% set listings = p.get_listings() %}
+    {% set overrides = p.get_overrides() %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.brand }}</td>
+      <td>{{ p.model }}</td>
+      <td>{{ p.storage }} {{ p.color }}</td>
+      <td>{{ p.condition }}</td>
+      <td>{{ p.stock }}</td>
+      <td>{{ "%.2f"|format(p.base_price) }}</td>
+      <td>
+        <div class="small">
+          X: {{ "%.2f"|format(overrides.get('X') or compute_listing_price(p.base_price, 'X')) }}<br>
+          Y: {{ "%.2f"|format(overrides.get('Y') or compute_listing_price(p.base_price, 'Y')) }}<br>
+          Z: {{ "%.2f"|format(overrides.get('Z') or compute_listing_price(p.base_price, 'Z')) }}
+        </div>
+      </td>
+      <td>
+        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('price_override', pid=p.id) }}">Set</a>
+      </td>
+      <td>
+        <div class="small">
+          {% for plt in ['X','Y','Z'] %}
+            {% set L = listings.get(plt) %}
+            {% if L and L.status %}
+              {% if L.status == 'listed' %}
+                <div>✅ {{ plt }} @ ${{ L.price }} ({{ L.condition_mapped }})</div>
+              {% elif L.status == 'failed' %}
+                <div>❌ {{ plt }} — {{ L.reason }}</div>
+              {% else %}
+                <div>⏺ {{ plt }} — {{ L.status }}</div>
+              {% endif %}
+            {% else %}
+              <div>— {{ plt }}: not listed</div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </td>
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('edit_phone', pid=p.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('delete_phone', pid=p.id) }}" onsubmit="return confirm('Delete this phone?')">
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+        </div>
+        <div class="btn-group mt-2">
+          {% for plt in ['X','Y','Z'] %}
+          <form method="post" action="{{ url_for('list_phone', pid=p.id, platform=plt) }}">
+            <button class="btn btn-sm btn-outline-success">List {{ plt }}</button>
+          </form>
+          {% endfor %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% if not phones %}
+<div class="alert alert-info">No phones match your filters.</div>
+{% endif %}
+{% endblock %}
